@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Refer & Earn</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>রেফার করো & আয় করো</h1>
+    <p>প্রতি বন্ধু জয়েন করলে পাবে $0.25!</p>
+    <div class="notification" onclick="showNotice()">🔔</div>
+  </header>
+
+  <div class="notice-box" id="noticeBox">নতুন আপডেট: প্রতি রেফারে এখন $0.25</div>
+
+  <div class="container">
+    <div class="balance-box">বর্তমান ব্যালেন্স: $<span id="balance">0.00</span></div>
+
+    <h3>তোমার রেফার লিঙ্ক:</h3>
+    <input type="text" id="referLink" readonly>
+    <div class="copy-add-wrap">
+      <button class="btn" onclick="copyLink()">কপি করো</button>
+      <button class="btn" onclick="addAdBalance()">+ $0.01 অ্যাড করো</button>
+    </div>
+
+    <div class="share-note">
+      Messenger এ শেয়ার করে বন্ধুদের ইনভাইট করুন।<br>
+      <b>কেন রেফার করবেন?</b><br>
+      প্রতি রেফারে পাবে $0.25। মাত্র ২০ জন রেফার করলেই পাবে $5।<br>
+      এই ডলার দিয়ে আপনি বিকাশ অথবা নগদে টাকা নিতে পারবেন। আপনার লিংকে ক্লিক করলেই $0.25 পাবেন এখনি আপনার বন্ধুদের শেয়ার করুন।<br>
+      <span id="shareText"></span>
+    </div>
+
+    <div class="share-buttons">
+      <a id="messengerShare" target="_blank">Messenger এ শেয়ার করুন</a>
+      <a id="whatsappShare" target="_blank">WhatsApp এ শেয়ার করুন</a>
+      <a id="facebookShare" target="_blank">Facebook এ শেয়ার করুন</a>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn" onclick="toggleWithdraw()">Withdraw request</button>
+      <button class="btn btn-purple" onclick="window.open('https://www.facebook.com/share/18vLLiRL7Y/')">Payment Proof</button>
+      <button class="btn btn-signup" id="signupBtn" onclick="toggleSignup()">Sign Up</button>
+    </div>
+
+    <div class="form-section" id="withdrawForm">
+      <button class="form-close" onclick="toggleWithdraw()">×</button>
+      <label>নাম:</label>
+      <input type="text" id="name">
+      <label>Withdraw Method:</label>
+      <select id="method">
+        <option>Bkash</option>
+        <option>Nagad</option>
+      </select>
+      <label>নম্বর:</label>
+      <input type="text" id="number">
+      <label>টাকার পরিমাণ ($):</label>
+      <input type="number" id="amount">
+      <button class="btn" onclick="submitWithdraw()">Withdraw করুন</button>
+      <div class="success" id="msg"></div>
+    </div>
+
+    <div class="signup-form" id="signupForm">
+      <h3>Sign Up ফর্ম</h3>
+      <input type="text" placeholder="Full Name">
+      <input type="text" placeholder="Username">
+      <input type="email" placeholder="Email">
+      <input type="text" placeholder="Phone">
+      <input type="password" placeholder="Password">
+      <button class="btn" onclick="window.open('https://www.profitableratecpm.com/mzze4b78n?key=e3998055e23a80c5cbffb7d80a88c74c')">Submit</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
