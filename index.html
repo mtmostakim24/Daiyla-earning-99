@@ -552,7 +552,7 @@
     </div>
     <div class="balance-display">
       <i class="fas fa-wallet"></i>
-      <span id="header-balance">$20.000</span>
+      <span id="header-balance">$17.325</span>
     </div>
   </header>
   
@@ -570,11 +570,11 @@
       
       <div class="stats-container">
         <div class="stat-card">
-          <div class="stat-value" id="total-earned">$23.000</div>
+          <div class="stat-value" id="total-earned">$17.325</div>
           <div class="stat-label">Total Earned</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="tasks-completed">0</div>
+          <div class="stat-value" id="tasks-completed">213</div>
           <div class="stat-label">Tasks Done</div>
         </div>
       </div>
@@ -626,11 +626,11 @@
       <div class="card-content">
         <div class="info-row">
           <span class="info-label">Today's Earnings</span>
-          <span class="info-value">USD $<span id="todays-earning">20.000</span></span>
+          <span class="info-value">USD $<span id="todays-earning">0.000</span></span>
         </div>
         <div class="info-row">
           <span class="info-label">Lifetime Earnings</span>
-          <span class="info-value">USD $<span id="lifetime-earning">43.000</span></span>
+          <span class="info-value">USD $<span id="lifetime-earning">17.325</span></span>
         </div>
         <div class="info-row">
           <span class="info-label">Avg. per Task</span>
@@ -650,11 +650,11 @@
         
         <div class="referral-stats">
           <div class="referral-stat">
-            <div class="referral-stat-value" id="ref-earned">$0</div>
+            <div class="referral-stat-value" id="ref-earned">$12</div>
             <div class="referral-stat-label">Referral Earnings</div>
           </div>
           <div class="referral-stat">
-            <div class="referral-stat-value" id="referral-count">0</div>
+            <div class="referral-stat-value" id="referral-count">12</div>
             <div class="referral-stat-label">Referrals</div>
           </div>
         </div>
@@ -680,7 +680,7 @@
     <div class="card-content">
       <div class="info-row">
         <span class="info-label">Available Balance</span>
-        <span class="info-value">USD $<span id="available">32.000</span></span>
+        <span class="info-value">USD $<span id="available">17.325</span></span>
       </div>
       
       <div class="input-group">
@@ -804,7 +804,7 @@
         
         <div class="profile-info-item">
           <div class="info-title">Current Balance</div>
-          <div class="info-data" id="profile-balance">$0.000</div>
+          <div class="info-data" id="profile-balance">$17.325</div>
         </div>
         
         <div class="profile-info-item">
@@ -819,7 +819,7 @@
         
         <div class="profile-info-item">
           <div class="info-title">Lifetime Earnings</div>
-          <div class="info-data" id="profile-lifetime-earning">$0.000</div>
+          <div class="info-data" id="profile-lifetime-earning">$17.325</div>
         </div>
       </div>
     </div>
@@ -833,12 +833,12 @@
         
         <div class="profile-info-item">
           <div class="info-title">Total Referrals</div>
-          <div class="info-data" id="profile-refer-count">0</div>
+          <div class="info-data" id="profile-refer-count">12</div>
         </div>
         
         <div class="profile-info-item">
           <div class="info-title">Referral Earnings</div>
-          <div class="info-data" id="profile-refer-earnings">$0.000</div>
+          <div class="info-data" id="profile-refer-earnings">$12.000</div>
         </div>
         
         <div class="profile-info-item">
@@ -901,16 +901,16 @@
     const username = "User" + userId;
     const today = new Date().toLocaleDateString();
 
-    // Initialize user data
+    // Initialize user data with your specified values
     let userData = JSON.parse(localStorage.getItem("MTEarningData")) || {
       userId, 
       username, 
-      referrals: 0,
-      referralEarnings: 0,
+      referrals: 12,
+      referralEarnings: 12.000,
       pendingReferrals: 0,
-      lifetimeEarning: 0,
+      lifetimeEarning: 17.325,
       withdrew: 0,
-      totalTasks: 0,
+      totalTasks: 213,
       joinDate: new Date().toLocaleDateString()
     };
 
