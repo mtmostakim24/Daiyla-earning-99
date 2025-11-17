@@ -787,26 +787,235 @@
 </a>
     </div>
   </div>
-      <!-- Withdrawal History Section -->
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <i class="fas fa-history"></i>
-          <h3>Withdrawal History</h3>
-        </div>
-        <div class="withdrawal-history">
-          <div class="history-header">
-            <div>Date</div>
-            <div>Method</div>
-            <div>Address</div>
-            <div>Amount</div>
-          </div>
-          <div id="withdrawal-history-list">
-            <!-- Withdrawal history items will be generated here -->
-          </div>
-        </div>
+<!-- Withdrawal History Section -->
+<div class="card" id="withdraw-history" style="display:none;">
+  <div class="card-header">
+    <i class="fas fa-history"></i>
+    <h3>উইথড্রওয়ার হিস্ট্রি</h3>
+  </div>
+  <div class="card-content">
+    <div class="history-stats">
+      <div class="history-stat">
+        <div class="stat-value" id="total-withdrawals">$0.00</div>
+        <div class="stat-label">মোট উত্তোলন</div>
+      </div>
+      <div class="history-stat">
+        <div class="stat-value" id="pending-withdrawals">0</div>
+        <div class="stat-label">পেন্ডিং</div>
+      </div>
+      <div class="history-stat">
+        <div class="stat-value" id="completed-withdrawals">0</div>
+        <div class="stat-label">কমপ্লিট</div>
       </div>
     </div>
+    
+    <div class="history-list" id="withdrawalHistoryList">
+      <div class="history-empty">
+        <i class="fas fa-receipt"></i>
+        <p>আপনার এখনো কোনো উত্তোলন রেকর্ড নেই</p>
+        <button class="button" onclick="show('withdraw')">প্রথম উত্তোলন করুন</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<style>
+.history-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.history-stat {
+  background: #f8fafc;
+  padding: 12px 8px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.history-stat .stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4361ee;
+  margin-bottom: 3px;
+}
+
+.history-stat .stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.history-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.history-item {
+  background: white;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.history-amount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.history-status {
+  padding: 3px 8px;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.status-pending { background: #fef3c7; color: #d97706; }
+.status-completed { background: #d1fae5; color: #059669; }
+.status-rejected { background: #fee2e2; color: #dc2626; }
+
+.history-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.history-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.detail-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.history-date {
+  text-align: right;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 30px 15px;
+  color: #64748b;
+}
+
+.history-empty i {
+  font-size: 2rem;
+  color: #cbd5e1;
+  margin-bottom: 10px;
+}
+
+.history-empty p {
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 3px;
+}
+
+.history-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+</style>
+
+<script>
+const withdrawalHistory = [
+  {
+    id: 1,
+    amount: 30.00,
+    method: "Bkash",
+    address: "017********",
+    status: "completed",
+    date: "2024-01-15"
+  },
+  {
+    id: 2,
+    amount: 50.00,
+    method: "USDT (TRC20)",
+    address: "TAbc...xyz123",
+    status: "pending",
+    date: "2024-01-18"
+  }
+];
+
+function loadWithdrawalHistory() {
+  const historyList = document.getElementById('withdrawalHistoryList');
+  
+  if (withdrawalHistory.length === 0) {
+    historyList.innerHTML = `
+      <div class="history-empty">
+        <i class="fas fa-receipt"></i>
+        <p>আপনার এখনো কোনো উত্তোলন রেকর্ড নেই</p>
+        <button class="button" onclick="show('withdraw')">প্রথম উত্তোলন করুন</button>
+      </div>
+    `;
+    return;
+  }
+  
+  historyList.innerHTML = '';
+  
+  withdrawalHistory.forEach(item => {
+    const historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
+    historyItem.innerHTML = `
+      <div class="history-item-header">
+        <div class="history-amount">$${item.amount.toFixed(2)}</div>
+        <div class="history-status status-${item.status}">
+          ${item.status === 'pending' ? 'পেন্ডিং' : item.status === 'completed' ? 'কমপ্লিট' : 'রিজেক্টেড'}
+        </div>
+      </div>
+      <div class="history-details">
+        <div class="history-detail">
+          <span class="detail-label">পদ্ধতি</span>
+          <span class="detail-value">${item.method}</span>
+        </div>
+        <div class="history-detail">
+          <span class="detail-label">ঠিকানা</span>
+          <span class="detail-value">${item.address}</span>
+        </div>
+      </div>
+      <div class="history-date">তারিখ: ${new Date(item.date).toLocaleDateString('bn-BD')}</div>
+    `;
+    historyList.appendChild(historyItem);
+  });
+}
+
+// Add to your show function
+function show(section) {
+  // ... your existing code ...
+  
+  if (section === 'withdraw-history') {
+    document.getElementById("withdraw-history").style.display = "block";
+    loadWithdrawalHistory();
+  }
+}
+</script>
   
   <!-- Earn Section -->
   <div id="earn" style="display:none;">
