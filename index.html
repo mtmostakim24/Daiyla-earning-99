@@ -3,1454 +3,2077 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Earning545 | Premium Earning Platform</title>
+  <title>Task Tycoon Bot | Premium Earning Platform</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
-    
-    :root {
-      --primary: #4361ee;
-      --primary-dark: #3a56d4;
-      --secondary: #4cc9f0;
-      --success: #4ade80;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --card-bg: #ffffff;
-      --body-bg: #f1f5f9;
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      --transition: all 0.3s ease;
-    }
-    
+
     body {
-      background-color: var(--body-bg);
-      color: var(--dark);
-      padding-bottom: 80px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
       min-height: 100vh;
-      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      padding-bottom: 70px;
+      overflow-x: hidden;
     }
-    
-    /* Header Styles */
-    header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    
-    header .title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: white;
-      font-size: 1.2rem;
-      font-weight: 700;
-    }
-    
-    header .title i {
-      font-size: 1.5rem;
-    }
-    
-    header .balance-display {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 6px 12px;
-      border-radius: 50px;
-      font-size: 0.9rem;
-      color: white;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    /* Profile Section */
-    .profile-container {
-      position: relative;
-      padding: 20px 0 30px;
-      overflow: hidden;
-    }
-    
-    .profile-container::before {
+
+    body::before {
       content: '';
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 70%;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+      pointer-events: none;
       z-index: 0;
-      border-radius: 0 0 30px 30px;
     }
-    
-    .profile {
+
+    .container {
       position: relative;
       z-index: 1;
-      text-align: center;
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 0 20px;
     }
-    
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+      transform: translateX(150%);
+      transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      max-width: 320px;
+    }
+
+    .notification.show {
+      transform: translateX(0);
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #f44336, #e91e63);
+    }
+
+    .notification.warning {
+      background: linear-gradient(135deg, #ff9800, #ff5722);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .title i {
+      margin-right: 10px;
+      font-size: 26px;
+      color: #ffd700;
+      animation: rotate 3s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .balance-display {
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(56, 142, 60, 0.3));
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-weight: bold;
+      border: 2px solid rgba(76, 175, 80, 0.5);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .profile-container {
+      padding: 20px;
+    }
+
+    .profile {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 25px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .profile-header {
       display: flex;
       align-items: center;
-      gap: 15px;
-      background: white;
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
-    
+
     .profile-img-container {
       width: 80px;
       height: 80px;
       border-radius: 50%;
       overflow: hidden;
-      border: 3px solid rgba(67, 97, 238, 0.2);
-      box-shadow: var(--shadow);
+      margin-right: 18px;
+      border: 4px solid #ffd700;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+      position: relative;
     }
-    
-    .profile img {
+
+    .profile-img-container::after {
+      content: '✓';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: #4CAF50;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      border: 3px solid white;
+    }
+
+    .profile-img-container img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .profile-info {
-      text-align: left;
       flex: 1;
     }
-    
+
     .name {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 5px;
-      color: var(--dark);
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-    
+
     .user-id {
-      font-size: 0.85rem;
-      color: var(--primary);
-      background: rgba(67, 97, 238, 0.1);
-      padding: 3px 8px;
-      border-radius: 20px;
+      font-size: 14px;
+      opacity: 0.9;
+      background: rgba(0,0,0,0.2);
+      padding: 4px 12px;
+      border-radius: 12px;
       display: inline-block;
     }
-    
-    /* Stats Section */
-    .stats-container {
+
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 15px;
+      margin-top: 20px;
     }
-    
-    .stat-card {
-      background: white;
-      border-radius: 12px;
-      padding: 15px 10px;
-      box-shadow: var(--shadow);
+
+    .stat-item {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2));
+      padding: 18px;
+      border-radius: 15px;
       text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
     }
-    
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
     .stat-value {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--primary);
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffd700;
+      margin-bottom: 8px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
-    
+
     .stat-label {
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: 5px;
+      font-size: 13px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    
-    /* Card Styles */
+
+    .cards-container {
+      padding: 0 20px 20px;
+    }
+
     .card {
-      background: var(--card-bg);
-      margin: 15px;
-      padding: 20px;
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 20px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
+      padding: 25px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: slideUp 0.5s ease-out;
     }
-    
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 5px;
-      width: 100%;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-    }
-    
+
     .card-header {
       display: flex;
       align-items: center;
       margin-bottom: 20px;
-      gap: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 15px;
     }
-    
+
     .card-header i {
-      width: 40px;
-      height: 40px;
-      background: rgba(67, 97, 238, 0.1);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary);
-      font-size: 1.2rem;
+      font-size: 26px;
+      margin-right: 12px;
+      color: #ffd700;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-    
+
     .card-header h3 {
-      font-size: 1.1rem;
-      color: var(--dark);
+      font-size: 19px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
-    
-    .card-content {
-      padding: 5px 0;
-    }
-    
+
     .info-row {
       display: flex;
       justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    
-    .info-row:last-child {
-      border-bottom: none;
-    }
-    
-    .info-label {
-      font-weight: 500;
-      color: #666;
-    }
-    
-    .info-value {
-      font-weight: 700;
-      color: var(--dark);
-    }
-    
-    .progress-container {
-      margin-top: 20px;
-    }
-    
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    
-    .progress {
-      height: 12px;
-      background: #e2e8f0;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      border-radius: 10px;
-      transition: var(--transition);
-    }
-    
-    /* Profile Page Styles */
-    #profile-page {
-      display: none;
-      padding: 20px;
-    }
-    
-    .profile-card {
-      background: white;
-      border-radius: 20px;
-      padding: 25px;
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
-    }
-    
-    .profile-section {
-      margin-bottom: 25px;
-    }
-    
-    .profile-section-title {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       margin-bottom: 15px;
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 1.1rem;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
     }
-    
-    .profile-info-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .profile-info-item:last-child {
-      border-bottom: none;
-    }
-    
-    .info-title {
-      color: #666;
-    }
-    
-    .info-data {
-      font-weight: 600;
-      color: var(--dark);
-    }
-    
-    .referral-section {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 20px;
-      margin-bottom: 20px;
-    }
-    
-    .referral-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin: 20px 0;
-    }
-    
-    .referral-stat {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 15px;
-      padding: 15px;
-      text-align: center;
-      backdrop-filter: blur(5px);
-    }
-    
-    .referral-stat-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-    
-    .referral-stat-label {
-      font-size: 0.9rem;
+
+    .info-label {
+      font-size: 14px;
       opacity: 0.9;
     }
-    
-    .referral-link {
-      background: white;
-      color: var(--primary);
-      padding: 15px;
-      border-radius: 15px;
-      font-weight: 500;
-      margin: 20px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+
+    .info-value {
+      font-size: 15px;
+      font-weight: bold;
+      color: #ffd700;
     }
-    
-    /* Button Styles */
-    .button {
-      display: block;
-      width: 100%;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      padding: 15px;
-      text-align: center;
-      border-radius: 15px;
-      margin-top: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
-      border: none;
-      font-size: 1rem;
-    }
-    
-    .button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
-    }
-    
-    .button-secondary {
-      background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-      box-shadow: none;
-    }
-    
-    .button-secondary:hover {
-      background: #f8fafc;
-      transform: none;
-    }
-    
-    /* Input Styles - Fixed sizing */
-    .input-group {
-      margin-bottom: 15px;
-    }
-    
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--dark);
-    }
-    
-    input, select {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 1rem;
-      background: #f8fafc;
-      transition: var(--transition);
-    }
-    
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-    }
-    
-    /* Navigation */
-    .nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      background: var(--card-bg);
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-      padding: 10px 0;
-      z-index: 100;
-    }
-    
-    .nav-item {
-      text-align: center;
-      font-size: 0.7rem;
-      cursor: pointer;
-      color: #666;
-      transition: var(--transition);
-      width: 70px;
-    }
-    
-    .nav-icon {
-      width: 24px;
-      height: 24px;
-      margin: 0 auto 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f1f5f9;
+
+    .progress-container {
+      background: rgba(0, 0, 0, 0.3);
+      height: 12px;
       border-radius: 10px;
-      padding: 12px;
-      transition: var(--transition);
+      overflow: hidden;
+      margin: 15px 0;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
     }
-    
-    .nav-item.active {
-      color: var(--primary);
-      font-weight: 600;
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #8BC34A, #4CAF50);
+      background-size: 200% 100%;
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.5s ease;
+      animation: shimmer 2s infinite;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
     }
-    
-    .nav-item.active .nav-icon {
-      background: rgba(67, 97, 238, 0.1);
-      color: var(--primary);
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
-    
-    .nav-label {
-      font-size: 0.75rem;
-    }
-    
-    /* Task Counter */
-    .task-counter {
+
+    .progress-info {
       display: flex;
       justify-content: space-between;
-      margin: 20px 0;
+      font-size: 13px;
+      margin-bottom: 15px;
+      font-weight: 500;
     }
-    
-    .counter-item {
-      text-align: center;
-      background: #f8fafc;
-      border-radius: 15px;
-      padding: 15px;
-      flex: 1;
-      margin: 0 5px;
-    }
-    
-    .counter-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-    
-    .counter-label {
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: 5px;
-    }
-    
-    /* Task Visualization */
-    .task-visualization {
+
+    .task-visual {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
+      justify-content: center;
+      gap: 6px;
       margin: 20px 0;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
     }
-    
+
     .task-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: #e2e8f0;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
-    
+
     .task-dot.completed {
-      background: var(--success);
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+      animation: completePulse 0.5s ease;
     }
-    
-    /* Notification */
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: white;
-      padding: 15px 25px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      transform: translateX(120%);
-      transition: transform 0.3s ease;
-      z-index: 1000;
+
+    @keyframes completePulse {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #4CAF50, #2E7D32);
+      color: white;
+      border: none;
+      padding: 15px 24px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      text-align: center;
+      transition: all 0.3s ease;
+      margin-top: 15px;
+      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(76, 175, 80, 0.6);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #2196F3, #0D47A1);
+      box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #ff9800, #f57c00);
+      box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+      box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+    }
+
+    .btn:disabled {
+      background: linear-gradient(135deg, #9e9e9e, #757575);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+
+    select option {
+      background: #2c3e50;
+      color: white;
+    }
+
+    /* Job Item Styles */
+    .job-item {
+      background: rgba(0,0,0,0.2);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .job-item:hover {
+      transform: translateX(5px);
+      background: rgba(0,0,0,0.3);
+    }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .job-user {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    
-    .notification.show {
-      transform: translateX(0);
+
+    .job-user i {
+      font-size: 24px;
+      color: #ffd700;
     }
-    
-    .notification.success {
-      border-left: 4px solid var(--success);
+
+    .job-user-info {
+      display: flex;
+      flex-direction: column;
     }
-    
-    .notification.error {
-      border-left: 4px solid var(--danger);
+
+    .job-username {
+      font-weight: bold;
+      font-size: 16px;
     }
-    
-    .notification.warning {
-      border-left: 4px solid var(--warning);
+
+    .job-poster {
+      font-size: 12px;
+      opacity: 0.8;
     }
-    
-    /* Responsive */
-    @media (min-width: 768px) {
-      .cards-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        margin: 15px;
+
+    .job-price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+
+    .job-price.high {
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    }
+
+    .job-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .job-footer .btn {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .status-pending {
+      background: #ff9800;
+      color: white;
+    }
+
+    .status-active {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .status-completed {
+      background: #2196F3;
+      color: white;
+    }
+
+    .status-rejected {
+      background: #f44336;
+      color: white;
+    }
+
+    /* Admin Panel */
+    .admin-panel {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .admin-close {
+      font-size: 30px;
+      cursor: pointer;
+      color: #ffd700;
+    }
+
+    .admin-section {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .admin-section h3 {
+      margin-bottom: 20px;
+      color: #ffd700;
+    }
+
+    .admin-job-item {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .admin-job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .admin-job-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .admin-link-input {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ffd700;
+      background: rgba(0,0,0,0.5);
+      color: white;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: #ffd700;
+      transition: width 0.3s ease;
+    }
+
+    .nav-item.active::before {
+      width: 60%;
+    }
+
+    .nav-item.active {
+      color: #ffd700;
+    }
+
+    .nav-item i {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        font-size: 18px;
       }
-      
-      .card {
-        margin: 0;
+
+      .balance-display {
+        padding: 8px 14px;
+        font-size: 14px;
       }
-      
+
       .profile {
-        max-width: 600px;
+        padding: 20px;
+      }
+
+      .profile-img-container {
+        width: 70px;
+        height: 70px;
+      }
+
+      .stat-value {
+        font-size: 20px;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+
+      .job-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .job-footer {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
-  <div class="notification" id="notification">
-    <i class="fas fa-check-circle"></i>
-    <span id="notification-message">Notification message</span>
-  </div>
-  
-  <header>
-    <div class="title">
-      <i class="fas fa-robot"></i>
-      <span>Daily Earning545</span>
+  <div class="container">
+    <!-- Notification -->
+    <div id="notification" class="notification">
+      <i class="fas fa-check-circle"></i>
+      <span id="notification-message"></span>
     </div>
-    <div class="balance-display">
-      <i class="fas fa-wallet"></i>
-      <span id="header-balance">$32.350</span>
-    </div>
-  </header>
-  
-  <div class="profile-container" id="home-profile">
-    <div class="profile">
-      <div class="profile-header">
-        <div class="profile-img-container">
-          <img src="https://i.ibb.co/6R45cM6C/Polish-20250529-015530961.jpg" alt="Profile">
-        </div>
-        <div class="profile-info">
-          <div class="name" id="username">Username</div>
-          <div class="user-id">ID: <span id="user-id">123456</span></div>
-        </div>
-      </div>
-      
-      <div class="stats-container">
-        <div class="stat-card">
-          <div class="stat-value" id="total-earned">$32.350</div>
-          <div class="stat-label">Total Earned</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="tasks-completed">614</div>
-          <div class="stat-label">Tasks Done</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Home Page Content -->
-  <div class="cards-container" id="home-content">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-tasks"></i>
-        <h3>Today's Tasks</h3>
-      </div>
-      <div class="card-content">
-        <div class="info-row">
-          <span class="info-label">Total Tasks</span>
-          <span class="info-value" id="total">100</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Completed</span>
-          <span class="info-value" id="completed-card">0</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Remaining</span>
-          <span class="info-value" id="remaining-card">100</span>
-        </div>
-        
-        <div class="progress-container">
-          <div class="progress-header">
-            <span class="info-label">Task Progress</span>
-            <span class="info-value" id="progress-percent">0%</span>
-          </div>
-          <div class="progress">
-            <div class="progress-bar" id="progress-bar"></div>
-          </div>
-        </div>
-        
-        <div class="task-visualization" id="task-visual">
-          <!-- Task dots will be generated here -->
-        </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-chart-line"></i>
-        <h3>Earnings</h3>
-      </div>
-      <div class="card-content">
-        <div class="info-row">
-          <span class="info-label">Today's Earnings</span>
-          <span class="info-value">USD $<span id="todays-earning">0.000</span></span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Lifetime Earnings</span>
-          <span class="info-value">USD $<span id="lifetime-earning">32.350</span></span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Avg. per Task</span>
-          <span class="info-value">$0.025</span>
-        </div>
-      </div>
-    </div>
-      <section style="max-width:1100px;margin:0 auto;padding:18px;">
 
-  <div style="
-    position:relative;
-    width:100%;
-    aspect-ratio:16/9;
-    background:#000;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 6px 22px rgba(0,0,0,0.45);
-  ">
-    <iframe
-      src="https://www.youtube.com/embed/5n9v_ZqPeS8?controls=1&rel=0&modestbranding=1"
-      allowfullscreen
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      referrerpolicy="strict-origin-when-cross-origin"
-      style="position:absolute;width:100%;height:100%;border:0;">
-    </iframe>
-  </div>
-</section>
-    
-    <div class="referral-section">
-      <div class="referral-header">
-        <i class="fas fa-users"></i>
-        <h3>Refer & Earn</h3>
-      </div>
-      
-      <div class="referral-content">
-        <p>Invite friends and earn $1 for each successful referral. Share your link and start earning!</p>
-        
-        <div class="referral-stats">
-          <div class="referral-stat">
-            <div class="referral-stat-value" id="ref-earned">$17</div>
-            <div class="referral-stat-label">Referral Earnings</div>
-          </div>
-          <div class="referral-stat">
-            <div class="referral-stat-value" id="referral-count">17</div>
-            <div class="referral-stat-label">Referrals</div>
-          </div>
-        </div>
-        
-        <div class="referral-link">
-          <span id="ref-link">https://t.me/Daily_Earning_545_Bot?start=ref_123456</span>
-          <i class="fas fa-copy" onclick="copyReferralLink()"></i>
-        </div>
-        
-        <button class="button" onclick="shareReferralLink()">
-          <i class="fas fa-share-alt"></i> Share Referral Link
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Withdraw Section -->
-  <div class="card" id="withdraw" style="display:none;">
-    <div class="card-header">
-      <i class="fas fa-money-bill-wave"></i>
-      <h3>Withdraw Funds</h3>
-    </div>
-    <div class="card-content">
-      <div class="info-row">
-        <span class="info-label">Available Balance</span>
-        <span class="info-value">USD $<span id="available">32.350</span></span>
-      </div>
-      
-      <div class="input-group">
-        <label>Withdrawal Method</label>
-        <select id="withdraw-method">
-          <option>Select a method</option>
-          <option>Bkash $30</option>
-          <option>Nagad $30</option>
-          <option>Payeer $50</option>
-          <option>USDT (TRC20) $50</option>
-          <option>Skrill $30</option>
-          <option>Neteller $30</option>
-          <option>Perfect Money $50</option>
-        </select>
-      </div>
-      
-      <div class="input-group">
-        <label>Amount (USD)</label>
-        <input type="text" id="withdraw-amount" placeholder="Enter amount">
-      </div>
-      
-      <div class="input-group">
-        <label>Withdrawal Address</label>
-        <input type="text" id="withdraw-address" placeholder="Enter wallet address">
-      </div>
-      
-      <button class="button" onclick="submitWithdrawal()">
-        <i class="fas fa-paper-plane"></i> Submit Withdrawal
-      </button>
-      <a href="https://t.me/Daily_Earning545_Bot" target="_blank" style="
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  background:#0088cc;
-  color:#fff;
-  padding:12px 20px;
-  font-size:18px;
-  font-weight:600;
-  border-radius:10px;
-  text-decoration:none;
-  box-shadow:0 6px 14px rgba(0,136,204,.35);
-">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" 
-       style="width:26px;height:26px;">
-  Join Payment Proof Channel
-</a>
-    </div>
-  </div>
-<!-- Withdrawal History Section -->
-<div class="card" id="withdraw-history" style="display:none;">
-  <div class="card-header">
-    <i class="fas fa-history"></i>
-    <h3>উইথড্রওয়ার হিস্ট্রি</h3>
-  </div>
-  <div class="card-content">
-    <div class="history-stats">
-      <div class="history-stat">
-        <div class="stat-value" id="total-withdrawals">$0.00</div>
-        <div class="stat-label">মোট উত্তোলন</div>
-      </div>
-      <div class="history-stat">
-        <div class="stat-value" id="pending-withdrawals">0</div>
-        <div class="stat-label">পেন্ডিং</div>
-      </div>
-      <div class="history-stat">
-        <div class="stat-value" id="completed-withdrawals">0</div>
-        <div class="stat-label">কমপ্লিট</div>
-      </div>
-    </div>
-    
-    <div class="history-list" id="withdrawalHistoryList">
-      <div class="history-empty">
-        <i class="fas fa-receipt"></i>
-        <p>আপনার এখনো কোনো উত্তোলন রেকর্ড নেই</p>
-        <button class="button" onclick="show('withdraw')">প্রথম উত্তোলন করুন</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-.history-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.history-stat {
-  background: #f8fafc;
-  padding: 12px 8px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.history-stat .stat-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #4361ee;
-  margin-bottom: 3px;
-}
-
-.history-stat .stat-label {
-  font-size: 0.7rem;
-  color: #64748b;
-}
-
-.history-list {
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.history-item {
-  background: white;
-  border: 1px solid #f1f5f9;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 8px;
-}
-
-.history-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.history-amount {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.history-status {
-  padding: 3px 8px;
-  border-radius: 15px;
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.status-pending { background: #fef3c7; color: #d97706; }
-.status-completed { background: #d1fae5; color: #059669; }
-.status-rejected { background: #fee2e2; color: #dc2626; }
-
-.history-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.history-detail {
-  display: flex;
-  flex-direction: column;
-}
-
-.detail-label {
-  font-size: 0.7rem;
-  color: #64748b;
-  margin-bottom: 2px;
-}
-
-.detail-value {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-.history-date {
-  text-align: right;
-  font-size: 0.7rem;
-  color: #94a3b8;
-}
-
-.history-empty {
-  text-align: center;
-  padding: 30px 15px;
-  color: #64748b;
-}
-
-.history-empty i {
-  font-size: 2rem;
-  color: #cbd5e1;
-  margin-bottom: 10px;
-}
-
-.history-empty p {
-  margin-bottom: 15px;
-  font-size: 0.8rem;
-}
-
-.history-list::-webkit-scrollbar {
-  width: 3px;
-}
-
-.history-list::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.history-list::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 10px;
-}
-</style>
-
-<script>
-const withdrawalHistory = [
-  {
-    id: 1,
-    amount: 30.00,
-    method: "Bkash",
-    address: "017********",
-    status: "completed",
-    date: "2024-01-15"
-  },
-  {
-    id: 2,
-    amount: 50.00,
-    method: "USDT (TRC20)",
-    address: "TAbc...xyz123",
-    status: "pending",
-    date: "2024-01-18"
-  }
-];
-
-function loadWithdrawalHistory() {
-  const historyList = document.getElementById('withdrawalHistoryList');
-  
-  if (withdrawalHistory.length === 0) {
-    historyList.innerHTML = `
-      <div class="history-empty">
-        <i class="fas fa-receipt"></i>
-        <p>আপনার এখনো কোনো উত্তোলন রেকর্ড নেই</p>
-        <button class="button" onclick="show('withdraw')">প্রথম উত্তোলন করুন</button>
-      </div>
-    `;
-    return;
-  }
-  
-  historyList.innerHTML = '';
-  
-  withdrawalHistory.forEach(item => {
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
-    historyItem.innerHTML = `
-      <div class="history-item-header">
-        <div class="history-amount">$${item.amount.toFixed(2)}</div>
-        <div class="history-status status-${item.status}">
-          ${item.status === 'pending' ? 'পেন্ডিং' : item.status === 'completed' ? 'কমপ্লিট' : 'রিজেক্টেড'}
-        </div>
-      </div>
-      <div class="history-details">
-        <div class="history-detail">
-          <span class="detail-label">পদ্ধতি</span>
-          <span class="detail-value">${item.method}</span>
-        </div>
-        <div class="history-detail">
-          <span class="detail-label">ঠিকানা</span>
-          <span class="detail-value">${item.address}</span>
-        </div>
-      </div>
-      <div class="history-date">তারিখ: ${new Date(item.date).toLocaleDateString('bn-BD')}</div>
-    `;
-    historyList.appendChild(historyItem);
-  });
-}
-
-// Add to your show function
-function show(section) {
-  // ... your existing code ...
-  
-  if (section === 'withdraw-history') {
-    document.getElementById("withdraw-history").style.display = "block";
-    loadWithdrawalHistory();
-  }
-}
-</script>
-  
-  <!-- Earn Section -->
-  <div id="earn" style="display:none;">
-    <div class="card">
-      <div class="card-header">
+    <!-- Header -->
+    <header>
+      <div class="title">
         <i class="fas fa-coins"></i>
-        <h3>Earn Money</h3>
+        Task Tycoon Bot
       </div>
-      <div class="card-content">
-        <p class="info-label" style="margin-bottom: 20px; text-align: center;">
-          <i class="fas fa-info-circle"></i> Earn money by viewing ads. Stay on the ad page for 15 seconds to complete a task and earn $0.025 per task!
-        </p>
-        
-        <div class="task-counter">
-          <div class="counter-item">
-            <div class="counter-value" id="etotal">100</div>
-            <div class="counter-label">Total Tasks</div>
+      <div class="balance-display">
+        <i class="fas fa-wallet"></i>
+        ৳<span id="header-balance">0.00</span>
+      </div>
+    </header>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="admin-panel">
+      <div class="admin-header">
+        <h2>⚡ Admin Panel</h2>
+        <div class="admin-close" onclick="toggleAdminPanel()">✕</div>
+      </div>
+
+      <div class="admin-section">
+        <h3>📋 Pending Jobs (Waiting for Approval)</h3>
+        <div id="admin-pending-jobs"></div>
+      </div>
+
+      <div class="admin-section">
+        <h3>✅ Active Jobs</h3>
+        <div id="admin-active-jobs"></div>
+      </div>
+
+      <div class="admin-section">
+        <h3>💰 Withdraw Requests</h3>
+        <div id="admin-withdraw-requests"></div>
+      </div>
+
+      <div class="admin-section">
+        <h3>💳 Deposit Requests</h3>
+        <div id="admin-deposit-requests"></div>
+      </div>
+    </div>
+
+    <!-- Home Profile Section -->
+    <div id="home-profile" class="profile-container">
+      <div class="profile">
+        <div class="profile-header">
+          <div class="profile-img-container">
+            <img id="profile-img" src="https://via.placeholder.com/80" alt="Profile">
           </div>
-          <div class="counter-item">
-            <div class="counter-value" id="ecompleted">0</div>
-            <div class="counter-label">Completed</div>
-          </div>
-          <div class="counter-item">
-            <div class="counter-value" id="eremaining">100</div>
-            <div class="counter-label">Remaining</div>
+          <div class="profile-info">
+            <div class="name" id="user-name">Loading...</div>
+            <div class="user-id">ID: <span id="display-user-id">------</span></div>
           </div>
         </div>
         
-        <div class="progress-container">
-          <div class="progress-header">
-            <span class="info-label">Task Progress</span>
-            <span class="info-value" id="earn-progress-percent">0%</span>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value">৳<span id="today-earning">0.00</span></div>
+            <div class="stat-label">Today's Earning</div>
           </div>
-          <div class="progress">
-            <div class="progress-bar" id="earn-progress-bar"></div>
+          <div class="stat-item">
+            <div class="stat-value">৳<span id="lifetime-earning">0.00</span></div>
+            <div class="stat-label">Total Earned</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value"><span id="total-tasks">0</span></div>
+            <div class="stat-label">Tasks Completed</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value"><span id="referral-count">0</span></div>
+            <div class="stat-label">Referrals</div>
           </div>
         </div>
-        
-        <button class="button" onclick="startTask()">
-          <i class="fas fa-play"></i> Start Earning ▶
+      </div>
+    </div>
+
+    <!-- Home Content Section -->
+    <div id="home-content" class="cards-container">
+      <!-- Daily Bonus Card -->
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-gift"></i>
+          <h3>Daily Bonus</h3>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Bonus Amount</span>
+          <span class="info-value">৳5.10</span>
+        </div>
+        <button class="btn btn-warning" onclick="claimDailyBonus()">
+          <i class="fas fa-gift"></i> Claim Daily Bonus
         </button>
       </div>
     </div>
-    
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-trophy"></i>
-        <h3>Task Completion</h3>
-      </div>
-      <div class="card-content">
-        <div class="task-visualization" id="earn-task-visual">
-          <!-- Task dots will be generated here -->
+
+    <!-- Earn Section (Main Job Listing) -->
+    <div id="earn" class="cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-tasks"></i>
+          <h3>Available Jobs</h3>
         </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Profile Page -->
-  <div id="profile-page">
-    <div class="profile-card">
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <i class="fas fa-user-circle"></i>
-          <h3>Account Information</h3>
-        </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Username</div>
-          <div class="info-data" id="profile-username">Username</div>
-        </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">User ID</div>
-          <div class="info-data" id="profile-user-id">123456</div>
-        </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Join Date</div>
-          <div class="info-data" id="join-date">2023-10-15</div>
-        </div>
+        <div id="available-jobs-list"></div>
       </div>
     </div>
-    
-    <div class="profile-card">
-      <div class="profile-section">
-        <div class="profile-section-title">
-          <i class="fas fa-wallet"></i>
-          <h3>Financial Summary</h3>
+
+    <!-- Post Job Section -->
+    <div id="post-job" class="cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-plus-circle"></i>
+          <h3>Post a New Job</h3>
         </div>
         
-        <div class="profile-info-item">
-          <div class="info-title">Current Balance</div>
-          <div class="info-data" id="profile-balance">$32.350</div>
+        <div class="input-group">
+          <label class="input-label">Your Telegram Username</label>
+          <input type="text" id="job-telegram" placeholder="@username" required>
         </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Total Withdrew</div>
-          <div class="info-data" id="profile-withdrew">$0.000</div>
+
+        <div class="input-group">
+          <label class="input-label">Number of Tasks</label>
+          <select id="job-tasks">
+            <option value="1000">1,000 Tasks</option>
+            <option value="2000">2,000 Tasks</option>
+            <option value="3000">3,000 Tasks</option>
+            <option value="5000">5,000 Tasks</option>
+            <option value="7000">7,000 Tasks</option>
+            <option value="10000">10,000 Tasks</option>
+          </select>
         </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Today's Earnings</div>
-          <div class="info-data" id="profile-today-earning">$0.000</div>
+
+        <div class="input-group">
+          <label class="input-label">Pay per Task (Minimum ৳0.050)</label>
+          <input type="number" id="job-rate" value="0.050" min="0.050" step="0.001">
         </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Lifetime Earnings</div>
-          <div class="info-data" id="profile-lifetime-earning">$32.350</div>
+
+        <div class="info-row">
+          <span class="info-label">Base Price (0.050 rate)</span>
+          <span class="info-value" id="base-price">৳50.00</span>
         </div>
+        <div class="info-row">
+          <span class="info-label">Additional Charge</span>
+          <span class="info-value" id="additional-charge">+ ৳10.00</span>
+        </div>
+        <div class="info-row" style="background: rgba(76, 175, 80, 0.2);">
+          <span class="info-label">Total Cost</span>
+          <span class="info-value" id="total-cost" style="font-size: 18px;">৳60.00</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Worker Will Get</span>
+          <span class="info-value" id="worker-pay">৳0.050 per task</span>
+        </div>
+
+        <button class="btn" onclick="submitJobPost()">
+          <i class="fas fa-cloud-upload-alt"></i> Submit Job for Approval
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-info-circle"></i>
+          <h3>Pricing Guide</h3>
+        </div>
+        <div class="info-row">
+          <span>1,000 Tasks</span>
+          <span>Base ৳60 + extra</span>
+        </div>
+        <div class="info-row">
+          <span>2,000 Tasks</span>
+          <span>Base ৳120 + extra</span>
+        </div>
+        <div class="info-row">
+          <span>3,000 Tasks</span>
+          <span>Base ৳180 + extra</span>
+        </div>
+        <div class="info-row">
+          <span>5,000 Tasks</span>
+          <span>Base ৳300 + extra</span>
+        </div>
+        <div class="info-row">
+          <span>7,000 Tasks</span>
+          <span>Base ৳420 + extra</span>
+        </div>
+        <div class="info-row">
+          <span>10,000 Tasks</span>
+          <span>Base ৳600 + extra</span>
+        </div>
+        <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">
+          * Base price calculated at ৳0.050 per task + ৳10 service fee
+        </p>
       </div>
     </div>
-    
-    <div class="profile-card">
-      <div class="profile-section">
-        <div class="profile-section-title">
+
+    <!-- My Jobs Section -->
+    <div id="my-jobs" class="cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-briefcase"></i>
+          <h3>My Posted Jobs</h3>
+        </div>
+        <div id="my-jobs-list"></div>
+      </div>
+    </div>
+
+    <!-- Withdraw Section -->
+    <div id="withdraw" class="cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-money-bill-wave"></i>
+          <h3>Withdraw Funds</h3>
+        </div>
+        
+        <div class="info-row">
+          <span class="info-label">Available Balance</span>
+          <span class="info-value">৳<span id="available-balance">0.00</span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Total Withdrawn</span>
+          <span class="info-value">৳<span id="total-withdrawn">0.00</span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Minimum Withdrawal</span>
+          <span class="info-value">৳1500.00</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Referrals Needed</span>
+          <span class="info-value"><span id="withdraw-referrals">0</span>/10</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Amount (BDT)</label>
+          <input type="number" id="withdraw-amount" placeholder="Enter amount" min="1500" step="1">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Payment Method</label>
+          <select id="withdraw-method">
+            <option value="">Select a method</option>
+            <option value="Bkash">Bkash</option>
+            <option value="Nagad">Nagad</option>
+            <option value="Rocket">Rocket</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Payment Address</label>
+          <input type="text" id="withdraw-address" placeholder="Enter payment address">
+        </div>
+
+        <button class="btn" onclick="submitWithdrawal()">
+          <i class="fas fa-paper-plane"></i> Submit Withdrawal
+        </button>
+      </div>
+    </div>
+
+    <!-- Deposit Section -->
+    <div id="deposit" class="cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-credit-card"></i>
+          <h3>Deposit Funds</h3>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Bkash (Personal)</span>
+          <span class="info-value">017XXXXXXXX</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Nagad (Personal)</span>
+          <span class="info-value">018XXXXXXXX</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Rocket (Personal)</span>
+          <span class="info-value">019XXXXXXXX</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Amount (BDT)</label>
+          <input type="number" id="deposit-amount" placeholder="Enter amount" min="100" step="1">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Payment Method</label>
+          <select id="deposit-method">
+            <option value="">Select a method</option>
+            <option value="Bkash">Bkash</option>
+            <option value="Nagad">Nagad</option>
+            <option value="Rocket">Rocket</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Transaction ID</label>
+          <input type="text" id="deposit-trx" placeholder="Enter transaction ID">
+        </div>
+
+        <button class="btn btn-secondary" onclick="submitDeposit()">
+          <i class="fas fa-paper-plane"></i> Submit Deposit
+        </button>
+      </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div id="profile-page" class="cards-container" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-user"></i>
+          <h3>Profile Information</h3>
+        </div>
+        <div class="profile-header">
+          <div class="profile-img-container">
+            <img id="profile-page-img" src="https://via.placeholder.com/80" alt="Profile">
+          </div>
+          <div class="profile-info">
+            <div class="name" id="profile-name">Loading...</div>
+            <div class="user-id">ID: <span id="profile-user-id">------</span></div>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Username</span>
+          <span class="info-value" id="profile-username">@username</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-value" id="member-since">Just now</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <i class="fas fa-users"></i>
           <h3>Referral Program</h3>
         </div>
         
-        <div class="profile-info-item">
-          <div class="info-title">Total Referrals</div>
-          <div class="info-data" id="profile-refer-count">17</div>
+        <div class="referral-link-container">
+          <div class="referral-link" id="referral-link">Loading...</div>
+          <button class="btn btn-secondary" onclick="copyReferralLink()">
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
         </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Referral Earnings</div>
-          <div class="info-data" id="profile-refer-earnings">$17.000</div>
-        </div>
-        
-        <div class="profile-info-item">
-          <div class="info-title">Pending Referrals</div>
-          <div class="info-data" id="profile-pending-refs">0</div>
+
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="total-referrals">0</div>
+            <div class="stat-label">Referrals</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">৳<span id="referral-earnings">0.00</span></div>
+            <div class="stat-label">Earned</div>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <div class="referral-section">
-      <div class="referral-header">
-        <i class="fas fa-share-alt"></i>
-        <h3>Share Your Referral Link</h3>
-      </div>
-      
-      <div class="referral-content">
-        <p>Earn $1 for every friend who signs up using your referral link!</p>
-        
-        <div class="referral-link">
-          <span id="profile-ref-link">https://t.me/Daily_Earning_545_Bot?start=ref_123456</span>
-          <i class="fas fa-copy" onclick="copyReferralLink()"></i>
-        </div>
-        
-        <button class="button" onclick="shareReferralLink()">
-          <i class="fas fa-share-alt"></i> Share Referral Link
+
+      <div id="admin-access" style="display: none;">
+        <button class="btn btn-purple" onclick="toggleAdminPanel()">
+          <i class="fas fa-cog"></i> Admin Panel
         </button>
       </div>
     </div>
-  </div>
-  
-  <div class="nav">
-    <div class="nav-item active" id="nav-home" onclick="show('home')">
-      <div class="nav-icon">
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-item active" id="nav-home" onclick="show('home')">
         <i class="fas fa-home"></i>
+        <span>Home</span>
       </div>
-      <div class="nav-label">Home</div>
-    </div>
-    <div class="nav-item" id="nav-earn" onclick="show('earn')">
-      <div class="nav-icon">
+      <div class="nav-item" id="nav-earn" onclick="show('earn')">
         <i class="fas fa-coins"></i>
+        <span>Earn</span>
       </div>
-      <div class="nav-label">Earn</div>
-    </div>
-    <div class="nav-item" id="nav-withdraw" onclick="show('withdraw')">
-      <div class="nav-icon">
-        <i class="fas fa-wallet"></i>
+      <div class="nav-item" id="nav-post" onclick="show('post-job')">
+        <i class="fas fa-plus-circle"></i>
+        <span>Post</span>
       </div>
-      <div class="nav-label">Withdraw</div>
-    </div>
-    <div class="nav-item" id="nav-profile" onclick="show('profile')">
-      <div class="nav-icon">
+      <div class="nav-item" id="nav-myjobs" onclick="show('my-jobs')">
+        <i class="fas fa-briefcase"></i>
+        <span>My Jobs</span>
+      </div>
+      <div class="nav-item" id="nav-profile" onclick="show('profile')">
         <i class="fas fa-user"></i>
+        <span>Profile</span>
       </div>
-      <div class="nav-label">Profile</div>
     </div>
   </div>
-  
+
   <script>
-    // Generate persistent user ID and username
-    let userId = localStorage.getItem("userId");
-    let username = localStorage.getItem("username");
+    // ==================== CONFIGURATION ====================
+    const BOT_TOKEN = "7853926530:AAFILPmZ3VcgPE67B_aMZZCJ6lDKPH7DZvI";
+    const ADMIN_CHAT_ID = "6986255063";
+    const MIN_RATE = 0.050;
     
-    // If not stored, generate new values
-    if (!userId) {
-      userId = Math.floor(Math.random() * 1000000);
-      localStorage.setItem("userId", userId);
+    // Base task counts and their prices
+    const TASK_PRICES = {
+      1000: { base: 60, workers: 1000 },
+      2000: { base: 120, workers: 2000 },
+      3000: { base: 180, workers: 3000 },
+      5000: { base: 300, workers: 5000 },
+      7000: { base: 420, workers: 7000 },
+      10000: { base: 600, workers: 10000 }
+    };
+
+    // ==================== GLOBAL VARIABLES ====================
+    let userData = null;
+    let jobs = [];
+    let withdrawRequests = [];
+    let depositRequests = [];
+
+    // ==================== INITIALIZATION ====================
+    let tg = window.Telegram?.WebApp;
+    
+    if (tg) {
+      tg.ready();
+      tg.expand();
     }
-    
-    if (!username) {
-      // Check if we're in Telegram environment
-      if (window.Telegram && window.Telegram.WebApp) {
-        const user = window.Telegram.WebApp.initDataUnsafe.user;
-        if (user && user.username) {
-          username = user.username;
-        } else if (user && user.first_name) {
-          username = user.first_name;
-          if (user.last_name) username += " " + user.last_name;
-        } else {
-          username = "User" + userId;
-        }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      initializeUser();
+      loadJobs();
+      loadRequests();
+      updateDisplay();
+      setupEventListeners();
+      checkAdminAccess();
+    });
+
+    function initializeUser() {
+      let user = null;
+      
+      if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        user = tg.initDataUnsafe.user;
       } else {
-        username = "User" + userId;
+        user = {
+          id: 123456789,
+          first_name: "Demo",
+          last_name: "User",
+          username: "demouser",
+          photo_url: "https://via.placeholder.com/80"
+        };
       }
-      localStorage.setItem("username", username);
+
+      const storageKey = `userData_${user.id}`;
+      const savedData = localStorage.getItem(storageKey);
+
+      if (savedData) {
+        userData = JSON.parse(savedData);
+      } else {
+        userData = {
+          userId: user.id,
+          firstName: user.first_name,
+          lastName: user.last_name || '',
+          username: user.username || '',
+          photoUrl: user.photo_url || 'https://via.placeholder.com/80',
+          balance: 0,
+          lifetimeEarning: 0,
+          withdrew: 0,
+          deposited: 0,
+          totalTasks: 0,
+          referrals: 0,
+          referralEarnings: 0,
+          joinDate: new Date().toISOString(),
+          transactions: [],
+          isAdmin: false
+        };
+
+        localStorage.setItem(storageKey, JSON.stringify(userData));
+      }
     }
-    
-    const today = new Date().toLocaleDateString();
 
-    // Initialize user data with updated values
-    let userData = JSON.parse(localStorage.getItem("MTEarningData")) || {
-      userId, 
-      username, 
-      referrals: 17,
-      referralEarnings: 17.000,
-      pendingReferrals: 0,
-      lifetimeEarning: 32.350,
-      withdrew: 0,
-      totalTasks: 614,
-      joinDate: new Date().toLocaleDateString()
-    };
-
-    let data = JSON.parse(localStorage.getItem("dailyEarningData")) || {
-      date: today, completed: 0, remaining: 100, todaysEarning: 0
-    };
-
-    if (data.date !== today) {
-      data = { date: today, completed: 0, remaining: 100, todaysEarning: 0 };
+    // ==================== JOB FUNCTIONS ====================
+    function loadJobs() {
+      jobs = JSON.parse(localStorage.getItem('jobs')) || [];
+      sortJobsByPriority();
     }
 
-    // Initialize display
-    updateDisplay();
+    function saveJobs() {
+      localStorage.setItem('jobs', JSON.stringify(jobs));
+    }
 
-    function updateStorage() {
-      localStorage.setItem("MTEarningData", JSON.stringify(userData));
-      localStorage.setItem("dailyEarningData", JSON.stringify(data));
+    function sortJobsByPriority() {
+      // Sort by rate (highest first) for display
+      jobs.sort((a, b) => b.ratePerTask - a.ratePerTask);
+    }
+
+    function calculateJobCost(tasks, rate) {
+      const baseInfo = TASK_PRICES[tasks];
+      const baseCost = tasks * MIN_RATE;
+      const extraRate = (rate - MIN_RATE) * tasks;
+      const serviceFee = 10; // Fixed service fee
+      
+      return {
+        baseCost: baseCost,
+        extraCost: extraRate,
+        serviceFee: serviceFee,
+        total: baseCost + extraRate + serviceFee,
+        workerPay: rate
+      };
+    }
+
+    // Update pricing when inputs change
+    function setupEventListeners() {
+      const tasksSelect = document.getElementById('job-tasks');
+      const rateInput = document.getElementById('job-rate');
+
+      if (tasksSelect) {
+        tasksSelect.addEventListener('change', updatePricing);
+      }
+      if (rateInput) {
+        rateInput.addEventListener('input', updatePricing);
+      }
+    }
+
+    function updatePricing() {
+      const tasks = parseInt(document.getElementById('job-tasks').value);
+      const rate = parseFloat(document.getElementById('job-rate').value) || MIN_RATE;
+      
+      const cost = calculateJobCost(tasks, rate);
+      
+      document.getElementById('base-price').textContent = `৳${cost.baseCost.toFixed(2)}`;
+      document.getElementById('additional-charge').textContent = `+ ৳${(cost.extraCost + cost.serviceFee).toFixed(2)}`;
+      document.getElementById('total-cost').textContent = `৳${cost.total.toFixed(2)}`;
+      document.getElementById('worker-pay').textContent = `৳${rate.toFixed(3)} per task`;
+    }
+
+    // Submit job post
+    function submitJobPost() {
+      const telegram = document.getElementById('job-telegram').value;
+      const tasks = parseInt(document.getElementById('job-tasks').value);
+      const rate = parseFloat(document.getElementById('job-rate').value);
+      
+      if (!telegram) {
+        showNotification("Please enter your Telegram username", "error");
+        return;
+      }
+
+      if (rate < MIN_RATE) {
+        showNotification(`Minimum rate is ৳${MIN_RATE.toFixed(3)} per task`, "error");
+        return;
+      }
+
+      const cost = calculateJobCost(tasks, rate);
+      
+      if (userData.balance < cost.total) {
+        showNotification("Insufficient balance! Please deposit first.", "error");
+        show('deposit');
+        return;
+      }
+
+      // Create job
+      const job = {
+        id: 'JOB' + Date.now(),
+        posterId: userData.userId,
+        posterName: userData.firstName + ' ' + userData.lastName,
+        posterUsername: telegram,
+        totalTasks: tasks,
+        completedTasks: 0,
+        ratePerTask: rate,
+        totalCost: cost.total,
+        status: 'pending',
+        workers: [],
+        adLinks: [],
+        createdAt: new Date().toISOString(),
+        priority: rate // Higher rate = higher priority
+      };
+
+      // Deduct balance
+      userData.balance -= cost.total;
+      userData.transactions.push({
+        id: 'JOB' + Date.now(),
+        type: 'job_post',
+        amount: -cost.total,
+        status: 'completed',
+        date: new Date().toISOString(),
+        jobId: job.id
+      });
+
+      jobs.push(job);
+      saveJobs();
+      updateStorage();
+      updateDisplay();
+      
+      showNotification("Job posted successfully! Waiting for admin approval.", "success");
+      
+      // Send notification to admin
+      sendJobToAdmin(job);
+
+      // Clear form
+      document.getElementById('job-telegram').value = '';
+      document.getElementById('job-rate').value = MIN_RATE.toFixed(3);
+      updatePricing();
+      
+      show('my-jobs');
+    }
+
+    // Send job to admin for approval
+    function sendJobToAdmin(job) {
+      const message = `
+📋 <b>NEW JOB PENDING APPROVAL</b>
+
+👤 <b>Poster:</b> ${job.posterName} (@${job.posterUsername})
+🆔 <b>User ID:</b> ${job.posterId}
+📊 <b>Tasks:</b> ${job.totalTasks.toLocaleString()}
+💰 <b>Rate:</b> ৳${job.ratePerTask.toFixed(3)} per task
+💵 <b>Total Cost:</b> ৳${job.totalCost.toFixed(2)}
+🆔 <b>Job ID:</b> <code>${job.id}</code>
+
+Add Adstera links and approve:
+      `;
+
+      const buttons = [[
+        { text: '✅ Approve', callback_data: `approve_job_${job.id}` },
+        { text: '❌ Reject', callback_data: `reject_job_${job.id}` }
+      ]];
+
+      sendTelegramMessage(ADMIN_CHAT_ID, message, buttons);
+    }
+
+    // Admin approve job
+    function approveJob(jobId, adLinks) {
+      const job = jobs.find(j => j.id === jobId);
+      if (job) {
+        job.status = 'active';
+        job.adLinks = adLinks || generateAdLinks(job.totalTasks);
+        saveJobs();
+        showNotification("Job approved and published!", "success");
+        
+        // Notify job poster
+        sendTelegramMessage(job.posterId, `
+✅ <b>Your Job Has Been Approved!</b>
+
+Your job with ${job.totalTasks.toLocaleString()} tasks at ৳${job.ratePerTask.toFixed(3)} per task is now live.
+
+Workers can now complete tasks and you'll pay ৳${job.ratePerTask.toFixed(3)} per completed task.
+        `);
+      }
+    }
+
+    // Generate Adstera links for tasks
+    function generateAdLinks(count) {
+      const links = [];
+      const adsteraLinks = [
+        'https://www.adsteratpd.com/afe6175585d03c71b11f2b39ef93f365/7950162cb58c33bbaba3c651abece89f',
+        'https://www.adsteratpd.com/afe6175585d03c71b11f2b39ef93f365/7950162cb58c33bbaba3c651abece89f',
+        'https://www.adsteratpd.com/afe6175585d03c71b11f2b39ef93f365/7950162cb58c33bbaba3c651abece89f'
+      ];
+      
+      for (let i = 0; i < count; i++) {
+        links.push(adsteraLinks[i % adsteraLinks.length]);
+      }
+      return links;
+    }
+
+    // Display available jobs in Earn section
+    function displayAvailableJobs() {
+      const container = document.getElementById('available-jobs-list');
+      const activeJobs = jobs.filter(j => j.status === 'active' && j.completedTasks < j.totalTasks);
+      
+      if (activeJobs.length === 0) {
+        container.innerHTML = '<div class="empty-history">No jobs available</div>';
+        return;
+      }
+
+      // Sort by priority (higher rate first)
+      activeJobs.sort((a, b) => b.ratePerTask - a.ratePerTask);
+
+      container.innerHTML = '';
+      activeJobs.forEach(job => {
+        const jobDiv = document.createElement('div');
+        jobDiv.className = 'job-item';
+        
+        const remaining = job.totalTasks - job.completedTasks;
+        const progress = (job.completedTasks / job.totalTasks * 100).toFixed(1);
+        const isHighRate = job.ratePerTask > MIN_RATE + 0.005; // Highlight if significantly higher
+
+        jobDiv.innerHTML = `
+          <div class="job-header">
+            <div class="job-user">
+              <i class="fas fa-user-circle"></i>
+              <div class="job-user-info">
+                <div class="job-username">${job.posterUsername}</div>
+                <div class="job-poster">Posted by ${job.posterName}</div>
+              </div>
+            </div>
+            <div class="job-price ${isHighRate ? 'high' : ''}">
+              ৳${job.ratePerTask.toFixed(3)}
+            </div>
+          </div>
+          
+          <div class="progress-info">
+            <span>Completed: ${job.completedTasks}/${job.totalTasks}</span>
+            <span>Remaining: ${remaining}</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${progress}%;"></div>
+          </div>
+
+          <div class="job-footer">
+            <button class="btn" onclick="viewAd('${job.id}')">
+              <i class="fas fa-play"></i> View Ad
+            </button>
+            <button class="btn btn-secondary" onclick="shareJob('${job.id}')">
+              <i class="fas fa-share-alt"></i>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(jobDiv);
+      });
+    }
+
+    // Display user's posted jobs
+    function displayMyJobs() {
+      const container = document.getElementById('my-jobs-list');
+      const userJobs = jobs.filter(j => j.posterId === userData.userId);
+      
+      if (userJobs.length === 0) {
+        container.innerHTML = '<div class="empty-history">You haven\'t posted any jobs yet</div>';
+        return;
+      }
+
+      // Sort by date (newest first)
+      userJobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      container.innerHTML = '';
+      userJobs.forEach(job => {
+        const jobDiv = document.createElement('div');
+        jobDiv.className = 'job-item';
+        
+        const remaining = job.totalTasks - job.completedTasks;
+        const progress = (job.completedTasks / job.totalTasks * 100).toFixed(1);
+
+        jobDiv.innerHTML = `
+          <div class="job-header">
+            <div class="job-user">
+              <i class="fas fa-briefcase"></i>
+              <div class="job-user-info">
+                <div class="job-username">${job.posterUsername}</div>
+                <div class="job-poster">
+                  Status: <span class="status-badge status-${job.status}">${job.status}</span>
+                </div>
+              </div>
+            </div>
+            <div class="job-price">
+              ৳${job.ratePerTask.toFixed(3)}
+            </div>
+          </div>
+          
+          <div class="progress-info">
+            <span>Completed: ${job.completedTasks}/${job.totalTasks}</span>
+            <span>Remaining: ${remaining}</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" style="width: ${progress}%;"></div>
+          </div>
+
+          <div class="info-row">
+            <span>Total Cost</span>
+            <span>৳${job.totalCost.toFixed(2)}</span>
+          </div>
+          <div class="info-row">
+            <span>Created</span>
+            <span>${new Date(job.createdAt).toLocaleDateString()}</span>
+          </div>
+        `;
+
+        container.appendChild(jobDiv);
+      });
+    }
+
+    // View Ad and complete task
+    function viewAd(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      
+      if (!job || job.status !== 'active') {
+        showNotification("Job not available", "error");
+        return;
+      }
+
+      if (job.completedTasks >= job.totalTasks) {
+        showNotification("This job has been completed", "warning");
+        return;
+      }
+
+      // Check if user already did this job
+      const userCompleted = job.workers.filter(w => w.userId === userData.userId).length;
+      if (userCompleted >= 1) {
+        showNotification("You can only complete each job once", "warning");
+        return;
+      }
+
+      const adLink = job.adLinks[job.completedTasks % job.adLinks.length];
+      const start = Date.now();
+      const ad = window.open(adLink, "_blank");
+
+      if (!ad) {
+        showNotification("Please allow popups to view ads", "error");
+        return;
+      }
+
+      // Show timer
+      const timerDiv = document.createElement('div');
+      timerDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.9);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        z-index: 1001;
+        text-align: center;
+        border: 2px solid #4CAF50;
+      `;
+      timerDiv.innerHTML = `
+        <i class="fas fa-hourglass-half" style="font-size: 48px; color: #4CAF50; margin-bottom: 15px;"></i>
+        <div style="font-size: 36px; font-weight: bold;" id="timer">15</div>
+        <div style="margin-top: 10px;">Seconds remaining</div>
+        <div style="font-size: 12px; margin-top: 15px; opacity: 0.7;">Please wait in the ad</div>
+      `;
+      document.body.appendChild(timerDiv);
+
+      let seconds = 15;
+      const timer = setInterval(() => {
+        seconds--;
+        document.getElementById('timer').textContent = seconds;
+        
+        if (seconds <= 0) {
+          clearInterval(timer);
+          timerDiv.remove();
+          
+          if (!ad.closed) {
+            ad.close();
+          }
+
+          // Complete task
+          job.completedTasks++;
+          job.workers.push({
+            userId: userData.userId,
+            userName: userData.firstName,
+            completedAt: new Date().toISOString()
+          });
+
+          // Add earnings
+          userData.balance += job.ratePerTask;
+          userData.lifetimeEarning += job.ratePerTask;
+          userData.totalTasks++;
+
+          // Add transaction
+          userData.transactions.push({
+            id: 'EARN' + Date.now(),
+            type: 'task_complete',
+            amount: job.ratePerTask,
+            status: 'completed',
+            date: new Date().toISOString(),
+            jobId: job.id
+          });
+
+          // Check if job is completed
+          if (job.completedTasks >= job.totalTasks) {
+            job.status = 'completed';
+            
+            // Notify job poster
+            sendTelegramMessage(job.posterId, `
+✅ <b>Your Job Has Been Completed!</b>
+
+All ${job.totalTasks.toLocaleString()} tasks have been completed.
+Total paid: ৳${(job.totalTasks * job.ratePerTask).toFixed(2)}
+            `);
+          }
+
+          saveJobs();
+          updateStorage();
+          updateDisplay();
+          displayAvailableJobs();
+          
+          showNotification(`✅ Task completed! ৳${job.ratePerTask.toFixed(3)} added to your balance.`, "success");
+        }
+      }, 1000);
+
+      // Check if ad closed early
+      const adCheck = setInterval(() => {
+        if (ad.closed && seconds > 0) {
+          clearInterval(timer);
+          clearInterval(adCheck);
+          timerDiv.remove();
+          showNotification("You closed the ad too early! Please wait 15 seconds.", "error");
+        }
+      }, 500);
+    }
+
+    // ==================== ADMIN FUNCTIONS ====================
+    function checkAdminAccess() {
+      const adminUsers = [6986255063, 123456789]; // Add your admin IDs
+      
+      if (userData && adminUsers.includes(userData.userId)) {
+        userData.isAdmin = true;
+        document.getElementById('admin-access').style.display = 'block';
+        updateStorage();
+        loadAdminPanel();
+      }
+    }
+
+    function toggleAdminPanel() {
+      const panel = document.getElementById('admin-panel');
+      if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+      } else {
+        panel.style.display = 'block';
+        loadAdminPanel();
+      }
+    }
+
+    function loadAdminPanel() {
+      // Pending jobs
+      const pendingJobs = jobs.filter(j => j.status === 'pending');
+      const pendingContainer = document.getElementById('admin-pending-jobs');
+      
+      if (pendingJobs.length === 0) {
+        pendingContainer.innerHTML = '<div class="empty-history">No pending jobs</div>';
+      } else {
+        pendingContainer.innerHTML = pendingJobs.map(job => `
+          <div class="admin-job-item">
+            <div class="admin-job-header">
+              <div>
+                <strong>${job.posterName}</strong> (@${job.posterUsername})
+              </div>
+              <div>Tasks: ${job.totalTasks.toLocaleString()}</div>
+            </div>
+            <div>Rate: ৳${job.ratePerTask.toFixed(3)} | Total: ৳${job.totalCost.toFixed(2)}</div>
+            <div>Job ID: <code>${job.id}</code></div>
+            
+            <div class="input-group">
+              <label>Adstera Links (one per line)</label>
+              <textarea id="links-${job.id}" class="admin-link-input" rows="3" placeholder="Enter Adstera links (one per line)"></textarea>
+            </div>
+            
+            <div class="admin-job-actions">
+              <button class="btn btn-secondary" onclick="approveJobWithLinks('${job.id}')">
+                <i class="fas fa-check"></i> Approve
+              </button>
+              <button class="btn btn-warning" onclick="rejectJob('${job.id}')">
+                <i class="fas fa-times"></i> Reject
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Active jobs
+      const activeJobs = jobs.filter(j => j.status === 'active');
+      const activeContainer = document.getElementById('admin-active-jobs');
+      
+      if (activeJobs.length === 0) {
+        activeContainer.innerHTML = '<div class="empty-history">No active jobs</div>';
+      } else {
+        activeContainer.innerHTML = activeJobs.map(job => `
+          <div class="admin-job-item">
+            <div class="admin-job-header">
+              <div>
+                <strong>${job.posterName}</strong> (@${job.posterUsername})
+              </div>
+              <div>Progress: ${job.completedTasks}/${job.totalTasks}</div>
+            </div>
+            <div>Rate: ৳${job.ratePerTask.toFixed(3)} | Total: ৳${job.totalCost.toFixed(2)}</div>
+            <div>Job ID: <code>${job.id}</code></div>
+            
+            <div class="input-group">
+              <label>Update Ad Links</label>
+              <textarea id="update-links-${job.id}" class="admin-link-input" rows="3">${job.adLinks.join('\n')}</textarea>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="updateJobLinks('${job.id}')">
+              <i class="fas fa-save"></i> Update Links
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Withdraw requests
+      const pendingWithdraws = withdrawRequests.filter(r => r.status === 'pending');
+      const withdrawContainer = document.getElementById('admin-withdraw-requests');
+      
+      if (pendingWithdraws.length === 0) {
+        withdrawContainer.innerHTML = '<div class="empty-history">No pending withdrawals</div>';
+      } else {
+        withdrawContainer.innerHTML = pendingWithdraws.map(req => `
+          <div class="admin-job-item">
+            <div>User: ${req.userName} (ID: ${req.userId})</div>
+            <div>Amount: ৳${req.amount.toFixed(2)} | Method: ${req.method}</div>
+            <div>Address: ${req.address}</div>
+            <div class="admin-job-actions">
+              <button class="btn btn-secondary" onclick="approveWithdraw('${req.id}')">Approve</button>
+              <button class="btn btn-warning" onclick="rejectWithdraw('${req.id}')">Reject</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Deposit requests
+      const pendingDeposits = depositRequests.filter(r => r.status === 'pending');
+      const depositContainer = document.getElementById('admin-deposit-requests');
+      
+      if (pendingDeposits.length === 0) {
+        depositContainer.innerHTML = '<div class="empty-history">No pending deposits</div>';
+      } else {
+        depositContainer.innerHTML = pendingDeposits.map(req => `
+          <div class="admin-job-item">
+            <div>User: ${req.userName} (ID: ${req.userId})</div>
+            <div>Amount: ৳${req.amount.toFixed(2)} | Method: ${req.method}</div>
+            <div>TRX: ${req.trxId} | Sender: ${req.sender}</div>
+            <div class="admin-job-actions">
+              <button class="btn btn-secondary" onclick="approveDeposit('${req.id}')">Approve</button>
+              <button class="btn btn-warning" onclick="rejectDeposit('${req.id}')">Reject</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function approveJobWithLinks(jobId) {
+      const linksText = document.getElementById(`links-${jobId}`).value;
+      const links = linksText.split('\n').filter(l => l.trim() !== '');
+      
+      if (links.length === 0) {
+        showNotification("Please enter at least one Adstera link", "error");
+        return;
+      }
+
+      const job = jobs.find(j => j.id === jobId);
+      if (job) {
+        job.status = 'active';
+        job.adLinks = links;
+        saveJobs();
+        loadAdminPanel();
+        showNotification("Job approved and published!", "success");
+        
+        // Notify user
+        sendTelegramMessage(job.posterId, `
+✅ <b>Your Job Has Been Approved!</b>
+
+Your job with ${job.totalTasks.toLocaleString()} tasks at ৳${job.ratePerTask.toFixed(3)} per task is now live.
+
+Check "My Jobs" section to track progress.
+        `);
+      }
+    }
+
+    function updateJobLinks(jobId) {
+      const linksText = document.getElementById(`update-links-${jobId}`).value;
+      const links = linksText.split('\n').filter(l => l.trim() !== '');
+      
+      const job = jobs.find(j => j.id === jobId);
+      if (job) {
+        job.adLinks = links;
+        saveJobs();
+        showNotification("Job links updated successfully!", "success");
+      }
+    }
+
+    function rejectJob(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (job) {
+        job.status = 'rejected';
+        
+        // Refund user
+        const userKey = `userData_${job.posterId}`;
+        const user = JSON.parse(localStorage.getItem(userKey));
+        if (user) {
+          user.balance += job.totalCost;
+          localStorage.setItem(userKey, JSON.stringify(user));
+        }
+        
+        saveJobs();
+        loadAdminPanel();
+        showNotification("Job rejected and user refunded", "warning");
+        
+        // Notify user
+        sendTelegramMessage(job.posterId, `
+❌ <b>Your Job Has Been Rejected</b>
+
+Unfortunately, your job posting has been rejected. The amount of ৳${job.totalCost.toFixed(2)} has been refunded to your balance.
+
+Please check your job details and try again.
+        `);
+      }
+    }
+
+    // ==================== TELEGRAM FUNCTIONS ====================
+    async function sendTelegramMessage(chatId, message, buttons = null) {
+      try {
+        const payload = {
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML'
+        };
+
+        if (buttons) {
+          payload.reply_markup = {
+            inline_keyboard: buttons
+          };
+        }
+
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } catch (error) {
+        console.error('Telegram error:', error);
+      }
+    }
+
+    // ==================== WITHDRAW FUNCTIONS ====================
+    function submitWithdrawal() {
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
+      const method = document.getElementById('withdraw-method').value;
+      const address = document.getElementById('withdraw-address').value;
+      
+      if (isNaN(amount) || amount < 1500) {
+        showNotification("Minimum withdrawal amount is ৳1500", "error");
+        return;
+      }
+      if (amount > userData.balance) {
+        showNotification("Insufficient balance", "error");
+        return;
+      }
+      if ((userData.referrals || 0) < 0) {
+        showNotification("You need at least 10 referrals to withdraw", "error");
+        return;
+      }
+      if (!method) {
+        showNotification("Please select a withdrawal method", "error");
+        return;
+      }
+      if (!address) {
+        showNotification("Please enter your payment address", "error");
+        return;
+      }
+
+      const request = {
+        id: 'W' + Date.now(),
+        userId: userData.userId,
+        userName: userData.firstName + ' ' + userData.lastName,
+        amount: amount,
+        method: method,
+        address: address,
+        date: new Date().toISOString(),
+        status: 'pending'
+      };
+
+      withdrawRequests.push(request);
+      saveRequests();
+
+      // Update balance
+      userData.balance -= amount;
+      userData.transactions.push({
+        id: request.id,
+        type: 'withdraw',
+        amount: -amount,
+        status: 'pending',
+        date: new Date().toISOString()
+      });
+
+      updateStorage();
+      updateDisplay();
+      showNotification("Withdrawal request submitted!", "success");
+
+      // Notify admin
+      sendTelegramMessage(ADMIN_CHAT_ID, `
+💸 <b>NEW WITHDRAWAL REQUEST</b>
+
+👤 User: ${request.userName} (ID: ${userData.userId})
+💰 Amount: ৳${amount.toFixed(2)}
+💳 Method: ${method}
+📧 Address: ${address}
+
+🆔 Request ID: <code>${request.id}</code>
+      `);
+
+      // Clear form
+      document.getElementById('withdraw-amount').value = '';
+      document.getElementById('withdraw-method').value = '';
+      document.getElementById('withdraw-address').value = '';
+    }
+
+    // ==================== DEPOSIT FUNCTIONS ====================
+    function submitDeposit() {
+      const amount = parseFloat(document.getElementById('deposit-amount').value);
+      const method = document.getElementById('deposit-method').value;
+      const trxId = document.getElementById('deposit-trx').value;
+
+      if (isNaN(amount) || amount < 100) {
+        showNotification("Minimum deposit amount is ৳100", "error");
+        return;
+      }
+      if (!method) {
+        showNotification("Please select a payment method", "error");
+        return;
+      }
+      if (!trxId) {
+        showNotification("Please enter transaction ID", "error");
+        return;
+      }
+
+      const request = {
+        id: 'D' + Date.now(),
+        userId: userData.userId,
+        userName: userData.firstName + ' ' + userData.lastName,
+        amount: amount,
+        method: method,
+        trxId: trxId,
+        date: new Date().toISOString(),
+        status: 'pending'
+      };
+
+      depositRequests.push(request);
+      saveRequests();
+
+      showNotification("Deposit request submitted! Waiting for admin approval.", "success");
+
+      // Notify admin
+      sendTelegramMessage(ADMIN_CHAT_ID, `
+💳 <b>NEW DEPOSIT REQUEST</b>
+
+👤 User: ${request.userName} (ID: ${userData.userId})
+💰 Amount: ৳${amount.toFixed(2)}
+💳 Method: ${method}
+🔢 TRX ID: ${trxId}
+
+🆔 Request ID: <code>${request.id}</code>
+      `);
+
+      // Clear form
+      document.getElementById('deposit-amount').value = '';
+      document.getElementById('deposit-method').value = '';
+      document.getElementById('deposit-trx').value = '';
+    }
+
+    // ==================== UI FUNCTIONS ====================
+    function show(section) {
+      document.getElementById("home-profile").style.display = "none";
+      document.getElementById("home-content").style.display = "none";
+      document.getElementById("earn").style.display = "none";
+      document.getElementById("post-job").style.display = "none";
+      document.getElementById("my-jobs").style.display = "none";
+      document.getElementById("withdraw").style.display = "none";
+      document.getElementById("deposit").style.display = "none";
+      document.getElementById("profile-page").style.display = "none";
+      
+      if (section === 'home') {
+        document.getElementById("home-profile").style.display = "block";
+        document.getElementById("home-content").style.display = "block";
+      } else if (section === 'earn') {
+        document.getElementById("earn").style.display = "block";
+        displayAvailableJobs();
+      } else if (section === 'post-job') {
+        document.getElementById("post-job").style.display = "block";
+        updatePricing();
+      } else if (section === 'my-jobs') {
+        document.getElementById("my-jobs").style.display = "block";
+        displayMyJobs();
+      } else if (section === 'withdraw') {
+        document.getElementById("withdraw").style.display = "block";
+      } else if (section === 'deposit') {
+        document.getElementById("deposit").style.display = "block";
+      } else if (section === 'profile') {
+        document.getElementById("profile-page").style.display = "block";
+      }
+      
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.getElementById("nav-" + section).classList.add('active');
     }
 
     function updateDisplay() {
-      // Update home screen
-      document.getElementById("username").innerText = username;
-      document.getElementById("user-id").innerText = userId;
-      document.getElementById("completed-card").innerText = data.completed;
-      document.getElementById("remaining-card").innerText = data.remaining;
-      document.getElementById("todays-earning").innerText = data.todaysEarning.toFixed(3);
-      document.getElementById("lifetime-earning").innerText = userData.lifetimeEarning.toFixed(3);
-      document.getElementById("available").innerText = userData.lifetimeEarning.toFixed(3);
-      document.getElementById("header-balance").innerText = "$" + userData.lifetimeEarning.toFixed(3);
+      if (!userData) return;
+
+      // Header
+      document.getElementById("header-balance").textContent = userData.balance.toFixed(2);
+
+      // Home Profile
+      document.getElementById("user-name").textContent = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
+      document.getElementById("display-user-id").textContent = userData.userId;
+      document.getElementById("profile-img").src = userData.photoUrl;
+      document.getElementById("today-earning").textContent = "0.00"; // Implement today's earning logic
+      document.getElementById("lifetime-earning").textContent = userData.lifetimeEarning.toFixed(2);
+      document.getElementById("total-tasks").textContent = userData.totalTasks;
+      document.getElementById("referral-count").textContent = userData.referrals || 0;
+
+      // Withdraw
+      document.getElementById("available-balance").textContent = userData.balance.toFixed(2);
+      document.getElementById("total-withdrawn").textContent = userData.withdrew.toFixed(2);
+      document.getElementById("withdraw-referrals").textContent = userData.referrals || 0;
+
+      // Profile
+      document.getElementById("profile-name").textContent = userData.firstName + (userData.lastName ? ' ' + userData.lastName : '');
+      document.getElementById("profile-user-id").textContent = userData.userId;
+      document.getElementById("profile-page-img").src = userData.photoUrl;
+      document.getElementById("profile-username").textContent = '@' + (userData.username || 'user' + userData.userId);
       
-      // Update progress bar
-      const progressPercent = (data.completed / 100 * 100);
-      document.getElementById("progress-bar").style.width = progressPercent + "%";
-      document.getElementById("progress-percent").innerText = progressPercent.toFixed(0) + "%";
-      
-      // Update profile stats
-      document.getElementById("total-earned").innerText = "$" + userData.lifetimeEarning.toFixed(3);
-      document.getElementById("tasks-completed").innerText = userData.totalTasks;
-      
-      // Update referral section
-      document.getElementById("ref-earned").innerText = "$" + (userData.referralEarnings % 1 === 0 ? 
-        userData.referralEarnings.toFixed(0) : userData.referralEarnings.toFixed(2));
-      document.getElementById("referral-count").innerText = userData.referrals;
-      document.getElementById("ref-link").innerText = `https://t.me/Daily_Earning_545_Bot?start=ref_${userId}`;
-      
-      // Update profile page
-      document.getElementById("profile-username").innerText = username;
-      document.getElementById("profile-user-id").innerText = userId;
-      document.getElementById("profile-balance").innerText = "$" + userData.lifetimeEarning.toFixed(3);
-      document.getElementById("profile-withdrew").innerText = "$" + userData.withdrew.toFixed(3);
-      document.getElementById("profile-refer-count").innerText = userData.referrals;
-      document.getElementById("profile-refer-earnings").innerText = "$" + userData.referralEarnings.toFixed(3);
-      document.getElementById("profile-today-earning").innerText = "$" + data.todaysEarning.toFixed(3);
-      document.getElementById("profile-lifetime-earning").innerText = "$" + userData.lifetimeEarning.toFixed(3);
-      document.getElementById("join-date").innerText = userData.joinDate;
-      document.getElementById("profile-pending-refs").innerText = userData.pendingReferrals;
-      document.getElementById("profile-ref-link").innerText = `https://t.me/Daily_Earning_545_Bot?start=ref_${userId}`;
-      
-      // Update earn section
-      document.getElementById("ecompleted").innerText = data.completed;
-      document.getElementById("eremaining").innerText = data.remaining;
-      document.getElementById("earn-progress-bar").style.width = progressPercent + "%";
-      document.getElementById("earn-progress-percent").innerText = progressPercent.toFixed(0) + "%";
-      
-      // Update task visualization
-      updateTaskVisualization();
+      const joinDate = new Date(userData.joinDate);
+      document.getElementById("member-since").textContent = joinDate.toLocaleDateString();
+
+      // Referral
+      const refLink = `https://t.me/TaskTycoon_Bot?start=ref_${userData.userId}`;
+      document.getElementById("referral-link").textContent = refLink;
+      document.getElementById("total-referrals").textContent = userData.referrals || 0;
+      document.getElementById("referral-earnings").textContent = (userData.referralEarnings || 0).toFixed(2);
     }
 
-    function updateTaskVisualization() {
-      const homeVisual = document.getElementById("task-visual");
-      const earnVisual = document.getElementById("earn-task-visual");
-      homeVisual.innerHTML = "";
-      earnVisual.innerHTML = "";
-      
-      // Create 100 dots (10 rows of 10)
-      for (let i = 0; i < 10; i++) {
-        const row = document.createElement("div");
-        row.style.display = "flex";
-        row.style.justifyContent = "center";
-        row.style.gap = "5px";
-        row.style.marginBottom = "5px";
-        
-        for (let j = 0; j < 10; j++) {
-          const dot = document.createElement("div");
-          dot.className = "task-dot";
-          const index = i * 10 + j;
-          
-          if (index < data.completed) {
-            dot.classList.add("completed");
-          }
-          
-          row.appendChild(dot);
-        }
-        
-        homeVisual.appendChild(row.cloneNode(true));
-        earnVisual.appendChild(row.cloneNode(true));
-      }
+    function updateStorage() {
+      localStorage.setItem(`userData_${userData.userId}`, JSON.stringify(userData));
     }
 
-    // FIXED taskLinks array with commas
-    const taskLinks = [
-      "https://www.profitableratecpm.com/xi12f9t2ka?key=b4d48b8bf0cc620cc6eaff47ec2bf989",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/yppak428s?key=9cfcbb64a76c0c153ff07b5dcf3c6025",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/f8iikei3?key=33119cb486103a46370813277eacf7d5",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/aceejemvu?key=fac70a57e2295cbed71bbfd848a9cb0e",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/fstpz6h3b?key=52099a2067c8f5ed7a76532ac1657396",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/yb78vf3e4?key=2b7b3e9a4c7f7f8bf37199e48361bd84",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/uvhjwgzvvu?key=7d8eefe589a22bff00200aa016cdf4c5",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/kbdab1z3s?key=b5be9e22867bff3e30c2b62cf16912fb",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/tnpemkqn?key=5ce84b7862885391706a11f242e362f3",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ftpxujeri3?key=f2ea352cc8949e9314e7762abb19c1ab",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/xqu4056vbg?key=c56bd280d6af1bab103452830a1cfcff",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ysqpjek5h?key=832387bbca524e7c22bb700085d23d49",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/gw4zyy45z?key=50574ef50b71c2f6d5a020f48dae142f",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/sxvehv45s7?key=7a96e21e458cdc9c3619f1feed1cffa2",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/zcvyfj5md8?key=892745830204099910a06facd9d7fa6c",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/qki7bggmk?key=56448aae30c57c1a12884f48d1015b73",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/qeahx1upk?key=ce615990c30e5a16cc8301547305a246",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/qnjxdqt3z?key=93c8806797078a796dc98a600961ff64",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/wjifpat1?key=7d669885fc30f22ef9766bb1579ed6e2",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/zek655f0s3?key=2fc1d23d8628baa3803f3af51f00ff87",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ssqv9iem?key=05b99b8807c55b5d695f4d07c9d035a6",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ua0pj08kvt?key=551ca16550e661f9f4b92ab5c91c7da8",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/rirczvye57?key=148793959a44b361194b7091f1bbe01a",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ve2tefiez1?key=193f2b2d26235e306bf83538e615fed1",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/wb68w1x1e?key=e8de87a8e6327e4a790c89fe6f1f41e3",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/xi12f9t2ka?key=b4d48b8bf0cc620cc6eaff47ec2bf989",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/yppak428s?key=9cfcbb64a76c0c153ff07b5dcf3c6025",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/f8iikei3?key=33119cb486103a46370813277eacf7d5",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/aceejemvu?key=fac70a57e2295cbed71bbfd848a9cb0e",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/fstpz6h3b?key=52099a2067c8f5ed7a76532ac1657396",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/yb78vf3e4?key=2b7b3e9a4c7f7f8bf37199e48361bd84",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/uvhjwgzvvu?key=7d8eefe589a22bff00200aa016cdf4c5",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/kbdab1z3s?key=b5be9e22867bff3e30c2b62cf16912fb",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/tnpemkqn?key=5ce84b7862885391706a11f242e362f3",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ftpxujeri3?key=f2ea352cc8949e9314e7762abb19c1ab",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/xqu4056vbg?key=c56bd280d6af1bab103452830a1cfcff",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ysqpjek5h?key=832387bbca524e7c22bb700085d23d49",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/gw4zyy45z?key=50574ef50b71c2f6d5a020f48dae142f",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/sxvehv45s7?key=7a96e21e458cdc9c3619f1feed1cffa2",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/zcvyfj5md8?key=892745830204099910a06facd9d7fa6c",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/qki7bggmk?key=56448aae30c57c1a12884f48d1015b73",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/qeahx1upk?key=ce615990c30e5a16cc8301547305a246",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/qnjxdqt3z?key=93c8806797078a796dc98a600961ff64",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/wjifpat1?key=7d669885fc30f22ef9766bb1579ed6e2",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/zek655f0s3?key=2fc1d23d8628baa3803f3af51f00ff87",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ssqv9iem?key=05b99b8807c55b5d695f4d07c9d035a6",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ua0pj08kvt?key=551ca16550e661f9f4b92ab5c91c7da8",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/rirczvye57?key=148793959a44b361194b7091f1bbe01a",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/ve2tefiez1?key=193f2b2d26235e306bf83538e615fed1",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      "https://www.profitableratecpm.com/wb68w1x1e?key=e8de87a8e6327e4a790c89fe6f1f41e3",
-      "https://data741.click/0f0bc5daed7efe886efb/cc525ceb6d/?placementName=default",
-      
-    ];
+    function loadRequests() {
+      withdrawRequests = JSON.parse(localStorage.getItem('withdrawRequests')) || [];
+      depositRequests = JSON.parse(localStorage.getItem('depositRequests')) || [];
+    }
+
+    function saveRequests() {
+      localStorage.setItem('withdrawRequests', JSON.stringify(withdrawRequests));
+      localStorage.setItem('depositRequests', JSON.stringify(depositRequests));
+    }
 
     function showNotification(message, type) {
       const notification = document.getElementById("notification");
       const messageElement = document.getElementById("notification-message");
       
       messageElement.textContent = message;
-      notification.className = "notification " + type;
+      notification.className = "notification " + (type || "success");
       notification.classList.add("show");
       
       setTimeout(() => {
@@ -1458,144 +2081,123 @@ function show(section) {
       }, 3000);
     }
 
-    function startTask() {
-      if (data.completed >= 100) {
-        showNotification("You have completed all tasks for today!", "warning");
+    function claimDailyBonus() {
+      const lastBonusDate = localStorage.getItem(`lastBonusDate_${userData.userId}`);
+      const today = new Date().toLocaleDateString();
+      
+      if (lastBonusDate === today) {
+        showNotification("You've already claimed your daily bonus today!", "warning");
         return;
       }
       
-      const start = Date.now();
-      const ad = window.open(taskLinks[data.completed % taskLinks.length], "_blank");
-      
-      if (!ad) {
-        showNotification("Please allow popups to complete tasks", "error");
-        return;
-      }
-      
-      const check = setInterval(() => {
-        if (ad.closed) {
-          clearInterval(check);
-          const duration = (Date.now() - start) / 1000;
-          
-          if (duration >= 15) {
-            data.completed++;
-            data.remaining = 100 - data.completed;
-            data.todaysEarning += 0.025;
-            userData.lifetimeEarning += 0.025;
-            userData.totalTasks++;
-            updateStorage();
-            updateDisplay();
-            showNotification("✅ Task completed! $0.025 added to your balance.", "success");
-          } else {
-            showNotification("⏱️ You must view the ad for at least 15 seconds to complete the task!", "error");
-          }
-        }
-      }, 500);
-    }
-
-    function submitWithdrawal() {
-      const amount = parseFloat(document.getElementById("withdraw-amount").value);
-      const method = document.getElementById("withdraw-method").value;
-      const address = document.getElementById("withdraw-address").value;
-      
-      if (isNaN(amount)) {
-        showNotification("Please enter a valid amount", "error");
-        return;
-      }
-      if (amount < 30) {
-        showNotification("Minimum withdrawal amount is $30", "error");
-        return;
-      }
-      if (amount > userData.lifetimeEarning) {
-        showNotification("Insufficient balance", "error");
-        return;
-      }
-      if (userData.referrals < 10) {
-        showNotification("You need at least 10 referrals to withdraw", "error");
-        return;
-      }
-      if (method === "Select a method") {
-        showNotification("Please select a withdrawal method", "error");
-        return;
-      }
-      if (!address) {
-        showNotification("Please enter your withdrawal address", "error");
-        return;
-      }
-      
-      // Update balance
-      userData.lifetimeEarning -= amount;
-      userData.withdrew += amount;
+      userData.balance += 5.10;
+      userData.lifetimeEarning += 5.10;
+      localStorage.setItem(`lastBonusDate_${userData.userId}`, today);
       updateStorage();
       updateDisplay();
-      showNotification("Withdrawal request submitted successfully! It will be processed within 24-48 hours.", "success");
-    }
-
-    function show(section) {
-      // Hide all sections first
-      document.getElementById("home-profile").style.display = "none";
-      document.getElementById("home-content").style.display = "none";
-      document.getElementById("withdraw").style.display = "none";
-      document.getElementById("earn").style.display = "none";
-      document.getElementById("profile-page").style.display = "none";
-      
-      // Show appropriate section
-      if (section === 'home') {
-        document.getElementById("home-profile").style.display = "block";
-        document.getElementById("home-content").style.display = "block";
-      } else if (section === 'withdraw') {
-        document.getElementById("withdraw").style.display = "block";
-      } else if (section === 'earn') {
-        document.getElementById("earn").style.display = "block";
-      } else if (section === 'profile') {
-        document.getElementById("profile-page").style.display = "block";
-      }
-      
-      // Update navigation
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      document.getElementById("nav-" + section).classList.add('active');
+      showNotification("🎁 Daily bonus claimed! ৳5.10 added to your balance.", "success");
     }
 
     function copyReferralLink() {
-      const refLink = `https://t.me/Daily_Earning_545_Bot?start=ref_${userId}`;
+      const refLink = `https://t.me/TaskTycoon_Bot?start=ref_${userData.userId}`;
       navigator.clipboard.writeText(refLink)
-        .then(() => showNotification("✅ Referral link copied! You earn $1 for each successful referral.", "success"))
+        .then(() => showNotification("✅ Referral link copied!", "success"))
         .catch(() => showNotification("Failed to copy link", "error"));
     }
-    
-    function shareReferralLink() {
-      const refLink = `https://t.me/Daily_Earning_545_Bot?start=ref_${userId}`;
+
+    function shareJob(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return;
       
-      // Check if we're in a Telegram environment
-      if (window.Telegram && window.Telegram.WebApp) {
-        // Use Telegram's share functionality
-        window.Telegram.WebApp.share(refLink, { title: 'Earn with Daily Earning545' }, (success) => {
-          if (!success) {
-            // Fallback to copy if sharing fails
-            copyReferralLink();
-          }
-        });
-      } else if (navigator.share) {
-        // Use Web Share API for browsers that support it
+      const shareText = `💰 Earn ৳${job.ratePerTask.toFixed(3)} per task! Join @${job.posterUsername} on Task Tycoon Bot`;
+      
+      if (navigator.share) {
         navigator.share({
-          title: 'Earn with Daily Earning545',
-          text: 'Join Daily Earning545 and start earning money by completing simple tasks!',
-          url: refLink
-        })
-        .catch((error) => {
-          console.error('Sharing failed:', error);
-          copyReferralLink();
+          title: 'Task Tycoon Job',
+          text: shareText,
+          url: 'https://t.me/TaskTycoon_Bot'
+        }).catch(() => {
+          copyToClipboard(shareText);
         });
       } else {
-        // Fallback to copying the link
-        copyReferralLink();
+        copyToClipboard(shareText);
       }
     }
 
-    // Initialize task visualization
-    updateTaskVisualization();
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text)
+        .then(() => showNotification("Copied to clipboard!", "success"))
+        .catch(() => showNotification("Failed to copy", "error"));
+    }
+
+    // ==================== EXPOSE FUNCTIONS ====================
+    window.show = show;
+    window.viewAd = viewAd;
+    window.submitJobPost = submitJobPost;
+    window.submitWithdrawal = submitWithdrawal;
+    window.submitDeposit = submitDeposit;
+    window.claimDailyBonus = claimDailyBonus;
+    window.copyReferralLink = copyReferralLink;
+    window.shareJob = shareJob;
+    window.toggleAdminPanel = toggleAdminPanel;
+    window.approveJobWithLinks = approveJobWithLinks;
+    window.updateJobLinks = updateJobLinks;
+    window.rejectJob = rejectJob;
+    window.approveWithdraw = function(id) {
+      const req = withdrawRequests.find(r => r.id === id);
+      if (req) {
+        req.status = 'approved';
+        saveRequests();
+        loadAdminPanel();
+        showNotification("Withdraw approved!", "success");
+      }
+    };
+    window.rejectWithdraw = function(id) {
+      const req = withdrawRequests.find(r => r.id === id);
+      if (req) {
+        req.status = 'rejected';
+        
+        // Refund user
+        const userKey = `userData_${req.userId}`;
+        const user = JSON.parse(localStorage.getItem(userKey));
+        if (user) {
+          user.balance += req.amount;
+          localStorage.setItem(userKey, JSON.stringify(user));
+        }
+        
+        saveRequests();
+        loadAdminPanel();
+        showNotification("Withdraw rejected and refunded", "warning");
+      }
+    };
+    window.approveDeposit = function(id) {
+      const req = depositRequests.find(r => r.id === id);
+      if (req) {
+        req.status = 'approved';
+        
+        // Add to user balance
+        const userKey = `userData_${req.userId}`;
+        const user = JSON.parse(localStorage.getItem(userKey));
+        if (user) {
+          user.balance += req.amount;
+          user.deposited += req.amount;
+          localStorage.setItem(userKey, JSON.stringify(user));
+        }
+        
+        saveRequests();
+        loadAdminPanel();
+        showNotification("Deposit approved!", "success");
+      }
+    };
+    window.rejectDeposit = function(id) {
+      const req = depositRequests.find(r => r.id === id);
+      if (req) {
+        req.status = 'rejected';
+        saveRequests();
+        loadAdminPanel();
+        showNotification("Deposit rejected", "warning");
+      }
+    };
   </script>
 </body>
 </html>
